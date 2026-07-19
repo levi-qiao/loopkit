@@ -68,6 +68,7 @@ Any gap discovered mid-round goes into the ledger's **debt register** with a pri
 - Real data / secrets / license content never enter code, fixtures, logs, or commits.
 - Frozen contracts: zero changes.
 - Metrics only go up: any change that regresses a metric is rolled back the same round.
+- Metrics measured ONLY on the declared real eval set: a number from self-generated / synthetic inputs, or a cherry-picked subset, does not count and is never recorded as progress.
 }}
 
 ## Subagents (optional)
