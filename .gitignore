@@ -1,0 +1,10 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Local scratch — never commit a real project's generated loop artifacts here
+/loop/
+*.local.md
