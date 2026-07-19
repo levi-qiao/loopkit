@@ -63,10 +63,10 @@ The executor runs the loop against the ledger. The supervisor watches, commits c
 1. **Install the skill** — one line:
 
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/levi-qiao/loop-skill/main/install.sh | sh
+   curl -fsSL https://raw.githubusercontent.com/levi-qiao/loopkit/main/install.sh | sh
    ```
 
-   <sub>Prefer to do it by hand? `git clone https://github.com/levi-qiao/loop-skill ~/.claude/skills/loopkit`</sub>
+   <sub>Prefer to do it by hand? `git clone https://github.com/levi-qiao/loopkit ~/.claude/skills/loopkit`</sub>
 
 2. **Invoke it** in Claude Code:
 

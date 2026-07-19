@@ -1,6 +1,6 @@
 ---
 name: loopkit
-description: Run a long-horizon coding task as a self-supervised agentic loop. Interviews the user to generate a rigorous loop prompt plus a single-source-of-truth ledger, then optionally stands up a supervisor that checkpoint-commits and corrects drift on a schedule. Use when the user wants a durable multi-round autonomous loop that stays on-spec — clear goal, verifiable gates, anti-bloat discipline, explicit red lines — instead of a one-shot change. Bilingual EN / 中文.
+description: Run a long-horizon coding task as a self-supervised agentic loop. Interviews the user to generate a rigorous loop prompt plus a single-source-of-truth ledger, then optionally stands up a supervisor that checkpoint-commits and corrects drift on a schedule. Use when the user wants a durable multi-round autonomous loop that stays on-spec — clear goal, verifiable gates, anti-bloat discipline, explicit red lines — instead of a one-shot change.
 ---
 
 # loopkit — Agentic Loop + Supervisor
@@ -25,6 +25,10 @@ The core idea: **the ledger is the only scoreboard**, the executor does **one it
 - There's a real risk of scope creep, half-finished "looks done" work, or the agent quietly changing contracts / lowering the bar.
 
 Do **not** use it for a one-shot edit, or when success can't be verified without a human every time — say so and suggest a plain task instead.
+
+## Language
+
+**Conduct the interview in whatever language the user is writing in** — mirror them. If they write in Chinese, ask in Chinese; if in Spanish, ask in Spanish. Match that language in the prose you put inside the generated artifacts too (their goals, notes, red lines). Keep structural keywords, headings, and field names as they are in the templates so the files stay tool-friendly. Do not force the conversation into English.
 
 ## How to run it
 
@@ -51,7 +55,7 @@ Fill the templates in `templates/` with the interview answers:
 - `templates/ops-and-environment.md` → only if there are non-trivial build/env/data facts worth pinning
 - `templates/monitor-tick.md` → only if they want a supervisor
 
-Write them to a location the user picks (default: a `loop/` folder beside the target repos). Keep the ledger **compact** — it is read every round; bloat costs tokens. Carry only load-bearing history forward.
+Write them to a location the user picks (default: a `loop/` folder beside the target repos). Replace every `{{PLACEHOLDER}}` and delete the guidance comments. Keep the ledger **compact** — it is read every round; bloat costs tokens. Carry only load-bearing history forward.
 
 ### Step 3 — Start the executor
 
@@ -81,13 +85,3 @@ Schedule `monitor-tick.md` on the chosen interval. In Claude Code this is `CronC
 - `templates/` — the four fill-in artifacts.
 - `docs/methodology.md` — the deep dive (why each rule exists, failure modes it prevents).
 - `examples/add-tests-to-cli/` — a fully worked, generic example.
-
-## 中文说明
-
-本技能把"让这个项目达到生产标准 / 把精度做到基线以上 / 完成迁移"这类**长周期、多轮**的模糊任务，转成一套**能自治运行、不漂移**的循环，并可选配一个**监督器**定时巡检纠偏。
-
-通过一轮简短访谈（仓库与分支、可验证的总目标、可选里程碑及出口条件、每轮门禁命令、红线、提交授权、是否要监督器及间隔），生成四份产物：`loop-prompt.md`（执行提示词）、`loop-ledger.md`（唯一记分板）、`ops-and-environment.md`（环境事实）、`monitor-tick.md`（监督器，可选）。
-
-核心机制：**台账是唯一真相**；执行方**一轮只做一项 → 当轮验证 → 更新台账**；靠执行方无法绕过的规则防漂移（发现即登记不静默修、第 N 轮强制收敛、单轮净增行数上限、违反红线即停）。监督器**只经执行方会读的 directives 文件纠偏，绝不编辑执行方正在写的台账**，按授权做 checkpoint 提交，必须人类决定的事项上报而非擅自裁决。
-
-面试用的问题、生成步骤、启动执行方与监督器的方式，与上文英文一致。访谈时**不要臆测**：能从上下文确定的自行决定并说明假设；真正需要用户拍板的（数据策略、数据库访问、降低指标门槛）变成红线或 `owner-blocked` 项，绝不擅自替用户决定。
