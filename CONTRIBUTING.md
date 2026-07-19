@@ -1,6 +1,6 @@
-# Contributing to loopkit
+# Contributing to graphkit
 
-Thanks for helping! loopkit is deliberately small — a skill, four templates, docs, and one example. Contributions that keep it that way are the most welcome.
+Thanks for helping! graphkit is deliberately small — a skill, four templates, docs, and one example. Contributions that keep it that way are the most welcome.
 
 ## Good contributions
 
@@ -13,13 +13,13 @@ Thanks for helping! loopkit is deliberately small — a skill, four templates, d
 ## Hard rules
 
 - **No secrets, no real client data, ever** — in examples, fixtures, docs, or commit messages. Examples must use fictional projects.
-- **Keep it minimal.** New abstraction or config in the templates needs a concrete motivating case. loopkit preaches anti-bloat; the repo should practice it.
-- **Don't break the shape.** The methodology's load-bearing parts (single scoreboard, one-item rounds with same-round verification, a forcing function against growth, register-then-defer, hard stop conditions, absolute red lines) are the product. Tune the numbers, not the shape.
+- **Keep it minimal.** New abstraction or config in the templates needs a concrete motivating case. graphkit preaches anti-bloat; the repo should practice it.
+- **Don't break the shape.** The methodology's load-bearing parts (single scoreboard, one-item rounds with same-round verification, a forcing function against growth, register-then-defer, hard stop conditions, absolute red lines, and a supervisor node whose context is separate from the executor's) are the product. Tune the numbers, not the shape.
 
 ## How to submit
 
 1. Fork and branch.
-2. Make the change; if you touched an example, sanity-check that its ledger and prompt still tell a coherent story.
+2. Make the change; if you touched an example, sanity-check that its ledger and executor prompt still tell a coherent story.
 3. Open a PR describing the failure mode your change addresses or the tuning it documents.
 
 By contributing, you agree your contributions are licensed under the [MIT License](LICENSE).

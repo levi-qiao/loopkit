@@ -1,6 +1,6 @@
 <!--
-loopkit template: ops-and-environment.md — durable environment facts.
-The executor consults this instead of re-deriving build/env/data facts every round.
+graphkit template: ops.md — durable environment facts.
+The executor node consults this instead of re-deriving build/env/data facts every round.
 Only create this file if there ARE non-trivial facts worth pinning. Keep it factual.
 Red line: secrets / credentials / real data content NEVER go in this file — only policy
 about them (where they come from, that they're env-injected, that they never get logged).
@@ -29,4 +29,4 @@ about them (where they come from, that they're env-injected, that they never get
 
 ## Cost / resource notes (optional)
 
-{{If the loop's work changes the resource footprint, record the bounded analysis here so it's not re-litigated: what's the bottleneck, what extra memory/CPU/disk/network it needs, and why it's bounded.}}
+{{If the run's work changes the resource footprint, record the bounded analysis here so it's not re-litigated: what's the bottleneck, what extra memory/CPU/disk/network it needs, and why it's bounded.}}

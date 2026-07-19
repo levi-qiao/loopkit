@@ -9,7 +9,7 @@ labels: bug
 A clear description of the bug.
 
 **Which part**
-- [ ] `/loopkit` skill / interview
+- [ ] `/graphkit` skill / interview
 - [ ] a template (`templates/…`)
 - [ ] the installer (`install.sh`)
 - [ ] docs / example

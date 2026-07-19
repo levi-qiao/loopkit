@@ -6,12 +6,12 @@ labels: enhancement
 ---
 
 **The problem or drift mode**
-What failure of a long-running agent loop does this address?
+What failure of a long-running agent run does this address?
 
 **Proposed change**
-What you'd add or tune. Remember loopkit's rule: tune the numbers, not the shape
+What you'd add or tune. Remember graphkit's rule: tune the numbers, not the shape
 (single scoreboard, one-item rounds, forcing function, register-then-defer, hard
-stop conditions, red lines).
+stop conditions, red lines, clean-context supervisor separation).
 
 **Scope check**
 - [ ] It stays minimal (no bloat added to templates without a motivating case)

@@ -1,11 +1,11 @@
 #!/usr/bin/env sh
-# loopkit installer — drops the skill into your Claude Code skills folder.
+# graphkit installer — drops the skill into your Claude Code skills folder.
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/levi-qiao/loopkit/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/levi-qiao/graphkit/main/install.sh | sh
 set -eu
 
-SKILL_NAME="loopkit"
-REPO="https://github.com/levi-qiao/loopkit.git"
+SKILL_NAME="graphkit"
+REPO="https://github.com/levi-qiao/graphkit.git"
 SKILLS_DIR="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
 DEST="$SKILLS_DIR/$SKILL_NAME"
 
@@ -20,5 +20,5 @@ else
 fi
 
 echo ""
-echo "✅ loopkit installed."
-echo "   In Claude Code, run:  /loopkit"
+echo "✅ graphkit installed."
+echo "   In Claude Code, run:  /graphkit"

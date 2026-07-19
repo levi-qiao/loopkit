@@ -1,12 +1,12 @@
-# taskcat — Loop Ledger
+# taskcat — graphkit Ledger
 
-> This ledger is the loop's only scoreboard. Authority order: the task book in `loop-prompt.md` > this ledger.
+> This ledger is the run's only scoreboard. Authority order: the task book in `executor.md` > this ledger. Supervisor corrections: `directives.md`.
 
 ## Status header
 
 Current milestone: single goal (date parser green) | Round: 3 | Last round net lines: +18/−0
 Smallest unclosed item: GAP-002 timezone bug in `"in N days"` (picked up this round)
-Loop status: `active`
+Run status: `active`
 
 ---
 

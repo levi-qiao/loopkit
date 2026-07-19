@@ -1,20 +1,21 @@
 <!--
-loopkit template: loop-ledger.md — THE SINGLE SCOREBOARD.
-The executor rewrites this every round. Keep it COMPACT: it is read every round,
-so bloat costs tokens. When history piles up, archive the old rounds to a separate
-file and carry only load-bearing facts forward in the "Starting snapshot" below.
+graphkit template: ledger.md — THE SINGLE SCOREBOARD (shared state between nodes).
+The executor node rewrites this every round; the supervisor node only reads it.
+Keep it COMPACT: it is read every round, so bloat costs tokens. When history piles
+up, archive the old rounds to a separate file and carry only load-bearing facts
+forward in the "Starting snapshot" below.
 -->
 
-# {{PROJECT}} — Loop Ledger
+# {{PROJECT}} — graphkit Ledger
 
-> This ledger is the loop's only scoreboard. Authority order: {{AUTHORITY_LAYERS}} > this ledger. Environment facts: `ops-and-environment.md`.
-> When rounds accumulate, archive to `loop-ledger-archive-<date>.md` and keep only the snapshot below. Don't open archives unless debugging.
+> This ledger is the run's only scoreboard. Authority order: {{AUTHORITY_LAYERS}} > this ledger. Environment facts: `ops.md`. Corrections from the supervisor: `directives.md`.
+> When rounds accumulate, archive to `ledger-archive-<date>.md` and keep only the snapshot below. Don't open archives unless debugging.
 
 ## Status header
 
 Current milestone: {{M1 or "single goal"}} | Round: 0 (starts at 1) | Last round net lines: —
 Smallest unclosed item: {{FIRST_ITEM}}
-Loop status: `active`
+Run status: `active`
 
 ---
 

@@ -5,6 +5,7 @@ Thumbs.db
 .idea/
 .vscode/
 
-# Local scratch — never commit a real project's generated loop artifacts here
+# Local scratch — never commit a real project's generated graphkit artifacts here
+/graphkit/
 /loop/
 *.local.md
