@@ -86,6 +86,15 @@ Because the nodes share no context, each can run on a different model. The disci
 
 The executor prompt is plain Markdown pointing at plain Markdown — paste it into whichever agent is cheapest. The expensive reasoning is concentrated in authoring and the occasional audit, not spent on every round.
 
+## Hosts vs nodes
+
+A *node* is a role — executor, supervisor. A *host* is only what keeps a node alive across turns: a Grok `/goal` session, a Claude `CronCreate` tick, or you pasting into a fresh chat. Hosts are interchangeable; the graph doesn't change. Two rules stop a host from turning into a second scoreboard:
+
+- **Keep the ledger a live file, not host text.** Hand the host the executor prompt, but the ledger and directives stay files the node re-reads each round — never folded into the host's own goal/prompt text, where they go stale. A host's progress UI (a goal's done-bar) *mirrors* the ledger; it never replaces it, and the ledger wins every conflict.
+- **The supervisor is always its own host, in a fresh context** — a separate session or a cron tick, never a subagent inside the executor's session. That subagent would share the context the whole method keeps clean.
+
+So a cheap executor on one host and a strong supervisor on another is a first-class setup, not a special integration.
+
 ## Quickstart
 
 1. **Install:**
