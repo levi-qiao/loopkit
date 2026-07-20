@@ -1,9 +1,7 @@
 <!--
 graphkit template: executor.md — the EXECUTOR NODE prompt.
 Replace every {{PLACEHOLDER}}. Delete guidance comments before shipping.
-This is the prompt you paste into a FRESH agent context to run the executor node —
-or let the skill's `scripts/run.sh executor` feed it to a headless CLI, one fresh
-invocation per round.
+This is the prompt you paste into a FRESH agent context to run the executor node.
 It shares NO context with the supervisor node — they communicate only through the
 ledger and the directives file.
 Location: this file and its siblings (ledger, directives, ops, supervisor) live in
