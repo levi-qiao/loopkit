@@ -6,6 +6,8 @@
 
 一个 [Claude Code](https://claude.com/claude-code) 技能：把"让这个项目达到生产标准"这类模糊目标，拆成一个**执行节点**（干活）和一个**干净上下文的监督节点**——后者站在执行方的上下文*之外*盯着它，在漂移滚雪球之前纠偏。
 
+*graphkit 是 **graph engineering(图工程)** 的一次具体落地——从「调教一个智能体循环」转向「把分工明确的智能体角色接成一张图」。今天是两个角色,后续会加入更多。*
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 ![Claude Code Skill](https://img.shields.io/badge/Claude%20Code-Skill-8A2BE2)
@@ -27,12 +29,16 @@
 
 真正的陷阱是：**智能体自己发现不了这些。** 它就跑在*那个已经漂移的上下文里*——让它抄近路的那段被污染的历史，正是它推理时依据的历史。你问它"还在按规格走吗？"，它会自信地说是。于是你还是得每一轮盯着它。
 
-## 思路：别再 loop，改成 graph
+## 思路：从 loop engineering 到 graph engineering
 
-解法不是"更聪明的循环"，而是一张**图**。graphkit 把一次运行拆成**互不共享上下文、只通过持久状态通信的节点**：
+**Loop engineering（循环工程）** 是今天大多数人的做法：抱着一个长活的智能体循环使劲调——更好的提示词、更多提醒、更大的上下文窗口。它注定有天花板，因为污染这个循环判断力的，恰恰是它自己的历史。
+
+**Graph engineering（图工程）** 是另一条路：设计一张由*分工明确的智能体角色*组成的小图，每个角色以自己的干净上下文启动，只通过持久、可检视的状态相连。graphkit 就是这个理念在"长周期编码"这一个场景下的具体落地，从最小可用的两个角色起步：
 
 - 🛠️ **执行节点**——干活，一轮只做一项，对着唯一台账推进。
 - 🛰️ **监督节点**——每个 tick 都以**全新的、干净的上下文**启动，*只*读台账 + git 树，像评审一样从外部审视这次运行。它能抓到执行方结构性*看不见*的漂移——因为抄近路的时候，它根本不在场。
+
+今天是两个角色；这张图天生是要长大的——见[路线图](#路线图更多节点角色)。
 
 节点之间只通过可检视的状态说话——一份台账、一棵 git 树、一个单向 directives 文件——纪律因此被焊进了接线里，而不是寄望于"智能体自觉"：
 
@@ -102,7 +108,7 @@ flowchart LR
    /graphkit
    ```
 
-   回答简短面试（仓库与分支、目标 + 如何验证、里程碑、门禁命令、红线、提交授权、是否要监督节点）。graphkit 会把整张图生成到你仓库里一个全新的 `.graphkit/<日期-slug>/` 目录——**一次 run 一个目录**；新 run 绝不改旧 run 的文件，只把仍成立的结论蒸馏进自己的起点快照。
+   回答简短面试（仓库与分支、目标 + 如何验证、里程碑、门禁命令、红线、提交授权、是否要监督节点）。graphkit 会把整张图生成到你仓库里一个全新的 `.graphkit/<日期-slug>/` 目录——**一次 run 一个目录**；新 run 绝不改旧 run 的文件，只把仍成立的结论蒸馏进自己的起点快照。（[每个生成文件是干嘛的 →](#一次-run-的地图graphkit-生成的文件)）
 
 3. **启动执行节点。** graphkit 交给你一份 `executor.md`——粘进一个全新 agent 上下文让它跑。它是"指向台账的纯 Markdown"，所以这里完全可以用**廉价 agent**（Cursor 低价档、Grok、本地模型），不必是 Claude。用什么方式循环随你（`while` + 唤醒、cron，或每轮重新粘一次）。
 
@@ -110,18 +116,28 @@ flowchart LR
 
 > 没有 Claude Code？`templates/` 都是纯 Markdown——手动填好，方法论在任何智能体运行时上照样成立。
 
-## 目录
+## 仓库地图——每个文件是干嘛的
 
-| 路径 | 说明 |
+这些文件你都不用手改；了解它们是什么，一切就不神秘了：
+
+| 路径 | 是什么 |
 | --- | --- |
-| [`SKILL.md`](SKILL.md) | 技能入口——面试 + 生成流程。 |
-| [`templates/executor.md`](templates/executor.md) | 执行节点提示词模板。 |
-| [`templates/ledger.md`](templates/ledger.md) | 唯一记分板（共享状态）模板。 |
-| [`templates/directives.md`](templates/directives.md) | 单向纠偏边模板，每次 run 播种。 |
-| [`templates/ops-and-environment.md`](templates/ops-and-environment.md) | 环境/构建/数据事实模板。 |
-| [`templates/supervisor.md`](templates/supervisor.md) | 干净上下文监督节点模板。 |
-| [`docs/methodology.md`](docs/methodology.md) | 深度解析：每条规则防的是哪种失败。 |
-| [`examples/add-tests-to-cli/`](examples/add-tests-to-cli/) | 一个完整的脱敏样例。 |
+| [`SKILL.md`](SKILL.md) | 技能本体——你敲 `/graphkit` 时 Claude Code 执行的面试 + 生成流程。 |
+| [`templates/`](templates/) | 空白的节点与边模板，技能按 run 填充。没有 Claude Code？手动填好照样用——方法论不挑运行时。 |
+| [`docs/methodology.md`](docs/methodology.md) | 讲*为什么*：每条规则防的是哪种失败。哪条规则看着武断，就来这里查。 |
+| [`examples/add-tests-to-cli/`](examples/add-tests-to-cli/) | 一次跑完的样例——真实的 executor + 台账跑到第 3 轮长什么样。**最适合第一个读。** |
+
+## 一次 run 的地图——`/graphkit` 生成的文件
+
+每次 run 在*你的*仓库里得到一个全新的 `.graphkit/<日期-slug>/`。五个文件——谁写、你拿它干什么：
+
+| 文件 | 谁写 | 你拿它干什么 |
+| --- | --- | --- |
+| `executor.md` | 生成一次 | **粘进一个全新 agent 上下文**——执行节点就此启动。用你手里最便宜的 agent 就行。 |
+| `ledger.md` | 执行节点，每轮更新 | **看它就能跟上进度。** 唯一真相：目标、门禁、每轮日志、未决缺口。 |
+| `directives.md` | 监督节点（单向） | 纠偏指令落在这里，执行节点每轮读取。你随时也可以自己追加一条。 |
+| `ops.md` | 各节点，只追加 | 环境/构建/数据的持久事实，免得每个节点从头摸一遍。 |
+| `supervisor.md` | 生成一次 | 监督节点的提示词。在 Claude Code 里自动排期；每个 tick 都是干净上下文。 |
 
 ## 何时用，何时别用
 
@@ -140,6 +156,10 @@ flowchart LR
 **固定第 5 轮收敛会不会太武断？** 那只是默认值；面试里可调间隔与净行数上限。关键是存在*某个*强制收敛机制，而非具体数字。
 
 **节点能自己 commit / push 吗？** 仅当你在面试里授权。安全默认：执行方只实现+验证；提交是单独的授权步骤（常由监督节点做），push 永不自动。
+
+## 路线图：更多节点角色
+
+执行 + 监督只是*最小*可用的图，不是这个理念的全部。因为一个角色不过是"一份 Markdown 节点 + 一条可检视的边"——没有框架、没有运行时——这张图可以一次一个文件地长大。计划中的角色：**红队评审**（对"已完成"的断言做对抗性拷问）、**侦察/调研**（在关键路径之外探索方案、汇报进台账）、**测试裁判**（独占门禁，让执行方没法自己给自己判卷）。如果 graph engineering 这套实践打动了你，这些就是最好的第一批 PR。
 
 ## 贡献
 

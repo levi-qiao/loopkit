@@ -6,6 +6,8 @@
 
 A [Claude Code](https://claude.com/claude-code) skill that turns *"make this production-ready"* into an **executor node** that does the work and a **clean-context supervisor node** that watches it from *outside* the executor's context window and corrects drift before it compounds.
 
+*graphkit is **graph engineering** made concrete — the shift from tuning one agent loop to wiring specialized agent roles into a graph. Two roles today, more on the way.*
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 ![Claude Code Skill](https://img.shields.io/badge/Claude%20Code-Skill-8A2BE2)
@@ -27,12 +29,16 @@ Hand an agent a big, vague goal — *"get this repo to production quality"*, *"p
 
 And here's the trap: **the agent can't catch this in itself.** It's running *inside the same context that drifted* — the polluted history that made it cut the corner is the history it reasons from. Ask it "are you still on-spec?" and it will confidently say yes. So you end up babysitting every round anyway.
 
-## The idea: stop looping, start graphing
+## The idea: from loop engineering to graph engineering
 
-The fix isn't a smarter loop — it's a **graph**. graphkit splits the run into **nodes that never share a context**, only durable state:
+**Loop engineering** is what most of us do today: take one long-lived agent loop and try to make it smarter — better prompts, more reminders, a bigger context window. It plateaus, because the loop's own history is the thing corrupting its judgment.
+
+**Graph engineering** is the alternative: design a small graph of *specialized agent roles*, each booting with its own clean context, connected only by durable, inspectable state. graphkit is that idea made concrete for one scenario — long-horizon coding — starting with the smallest useful graph, two roles:
 
 - 🛠️ **Executor node** — does the work, one item per round, against a single ledger.
 - 🛰️ **Supervisor node** — boots with a **fresh, clean context every tick**, reads *only* the ledger + git tree, and judges the run from the outside — the way a reviewer would. It catches the drift the executor structurally *can't* see in itself, because it was never in the room when the corner was cut.
+
+Two roles today; the graph is designed to grow — see the [roadmap](#roadmap-more-node-roles).
 
 The nodes talk only through inspectable state — a ledger, a git tree, a one-way directives file — so the discipline is baked into the wiring, not into hoping the agent stays honest:
 
@@ -102,7 +108,7 @@ The executor prompt is plain Markdown pointing at plain Markdown — **paste it 
    /graphkit
    ```
 
-   Answer the short interview (repos & branches, the goal + how it's verified, milestones, gate commands, red lines, commit authorization, whether you want the supervisor node). graphkit writes the whole graph into a fresh `.graphkit/<date-slug>/` directory in your repo — **one directory per run**; a new run never edits an old run's files, it distills their learnings into its own starting snapshot.
+   Answer the short interview (repos & branches, the goal + how it's verified, milestones, gate commands, red lines, commit authorization, whether you want the supervisor node). graphkit writes the whole graph into a fresh `.graphkit/<date-slug>/` directory in your repo — **one directory per run**; a new run never edits an old run's files, it distills their learnings into its own starting snapshot. ([What each generated file does →](#map-of-a-run--the-files-graphkit-generates))
 
 3. **Start the executor node.** graphkit hands you an `executor.md` — paste it into a fresh agent context and let it run. It's plain Markdown pointing at your ledger, so this can be a **cheap agent** (Cursor's budget tier, Grok, a local model) — it doesn't have to be Claude. Loop it however you like (a `while` + wake, a cron, or just re-paste each round).
 
@@ -110,18 +116,28 @@ The executor prompt is plain Markdown pointing at plain Markdown — **paste it 
 
 > No Claude Code? The `templates/` are plain Markdown — fill them in by hand and the methodology still works with any agent runtime.
 
-## What's in the box
+## Map of the repo — what each file is for
 
-| Path | What |
+You never edit these by hand; know what they are so nothing feels magic:
+
+| Path | What it is |
 | --- | --- |
-| [`SKILL.md`](SKILL.md) | The skill entry — the interview + generation flow. |
-| [`templates/executor.md`](templates/executor.md) | The executor node prompt template. |
-| [`templates/ledger.md`](templates/ledger.md) | The single-scoreboard (shared state) template. |
-| [`templates/directives.md`](templates/directives.md) | The one-way corrections edge, seeded per run. |
-| [`templates/ops-and-environment.md`](templates/ops-and-environment.md) | Durable env/build/data facts template. |
-| [`templates/supervisor.md`](templates/supervisor.md) | The clean-context supervisor node template. |
-| [`docs/methodology.md`](docs/methodology.md) | Deep dive: every rule and the failure it prevents. |
-| [`examples/add-tests-to-cli/`](examples/add-tests-to-cli/) | A fully worked, generic example. |
+| [`SKILL.md`](SKILL.md) | The skill itself — the interview + generation flow Claude Code runs when you type `/graphkit`. |
+| [`templates/`](templates/) | Blank node & edge templates the skill fills in per run. No Claude Code? Fill them in by hand — the methodology works in any agent runtime. |
+| [`docs/methodology.md`](docs/methodology.md) | The *why*: every rule, and the failure mode it exists to prevent. Read when a rule feels arbitrary. |
+| [`examples/add-tests-to-cli/`](examples/add-tests-to-cli/) | A finished run to skim — what a real executor + ledger look like three rounds in. **Best first read.** |
+
+## Map of a run — the files `/graphkit` generates
+
+Each run gets a fresh `.graphkit/<date-slug>/` in *your* repo. Five files — here's who writes each one and what you do with it:
+
+| File | Who writes it | What you do with it |
+| --- | --- | --- |
+| `executor.md` | generated once | **Paste it into a fresh agent context** — that starts the executor node. Cheapest agent you have is fine. |
+| `ledger.md` | the executor, every round | **Read it to follow the run.** It's the single source of truth: goals, gates, round log, open gaps. |
+| `directives.md` | the supervisor (one-way) | Corrections land here; the executor reads it each round. You can append an order of your own anytime. |
+| `ops.md` | any node, append-only | Durable environment/build/data facts, so no node re-discovers them from scratch. |
+| `supervisor.md` | generated once | The supervisor node's prompt. In Claude Code it's scheduled for you; each tick is a clean context. |
 
 ## When to use it (and when not to)
 
@@ -140,6 +156,10 @@ The executor prompt is plain Markdown pointing at plain Markdown — **paste it 
 **Won't a fixed 5th-round convergence be arbitrary?** It's a default; the interview lets you tune the interval and the net-line cap. The point is that *some* forcing function exists, not the exact number.
 
 **Can a node commit / push on its own?** Only if you authorize it in the interview. The safe default: the executor implements and verifies; commits are a separate authorized step (often the supervisor's job), and push is never automatic.
+
+## Roadmap: more node roles
+
+Executor + supervisor is the *smallest* useful graph, not the whole idea. Since a role is just a Markdown node plus an inspectable edge — no framework, no runtime — the graph can grow one file at a time. Planned roles include a **red-team reviewer** (adversarially probes "done" claims), a **scout/researcher** (explores options off the critical path and reports into the ledger), and a **test oracle** (owns the gates so the executor can't grade its own homework). If graph engineering as a practice interests you, these are great first PRs.
 
 ## Contributing
 
