@@ -101,3 +101,4 @@ Decide from context what you reasonably can and state the assumption; anything g
 - `templates/` — the five fill-in artifacts (executor, ledger, directives, ops, supervisor).
 - `docs/methodology.md` — the deep dive (why each rule exists, failure modes it prevents).
 - `examples/add-tests-to-cli/` — a fully worked, generic example.
+- `examples/migrate-blob-storage/` — a longer worked example: milestones, a cohort pilot, and a supervisor directive in action.
