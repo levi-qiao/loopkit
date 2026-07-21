@@ -45,7 +45,11 @@ Keep it tight.}}
 | --- | --- | --- |
 | {{metric}} | {{baseline}} | {{measured or "pending"}} |
 
-## owner-blocked (human-decision items — log the one-line question, don't decide)
+## owner-blocked (genuinely case-by-case human-decision items — log the one-line question, don't decide)
+
+<!-- Only items with NO standing authorization. If a STANDING pre-authorization in
+     directives.md covers the action and its evidence bar is met, execute it — it does
+     not belong here. This list is for calls that truly need the owner case by case. -->
 
 {{none yet, or list}}
 

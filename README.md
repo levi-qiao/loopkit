@@ -48,6 +48,7 @@ The nodes communicate only through inspectable state — a ledger, a git tree, a
 - **Register-then-defer.** Gaps found mid-round are logged, not silently patched or ignored.
 - **Red lines that halt the run.** No unauthorized push, no destructive git on others' work, no secrets in commits, frozen contracts stay frozen, metrics never regress.
 - **One-way corrections.** The supervisor corrects drift — and wasteful method, such as a full-cohort run without a pilot — only through the directives file. It never edits the ledger and never shares the executor's context. It decides by default; only a short owner-only list escalates to you.
+- **Pre-adjudicated authority.** Owner-only decisions on the goal's critical path (e.g. dropping dead tables when the goal *is* slimming the schema) are settled up front in the interview into a **standing authorization** — an objective evidence bar the loop acts under autonomously — so the run executes its own work instead of stalling on "proposals awaiting sign-off". Only genuinely case-by-case calls escalate to you.
 
 No LangGraph, no Python runtime, no orchestration server: the nodes and edges are Markdown files any coding agent can follow.
 

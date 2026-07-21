@@ -11,7 +11,13 @@ On a successor run, copy still-in-force STANDING items into the new run's file.
 
 ## STANDING (always in force — carried across runs; treat like red lines)
 
-{{none yet, or items carried over from the previous run}}
+<!-- Also the home for OWNER PRE-AUTHORIZATIONS decided at interview time: an
+     owner-only action the executor MAY do autonomously once an objective evidence
+     bar is met (owner retro-reviews). This is what keeps a loop whose own work is
+     owner-only (e.g. dropping dead tables) from stalling on propose-and-wait.
+     Format: S-001 · PRE-AUTH — <action> is authorized once <checkable evidence bar>; apply via <reversible method>. -->
+
+{{none yet, or items carried over from the previous run — including owner pre-authorizations from the interview}}
 
 ## Corrections (numbered, append-only)
 

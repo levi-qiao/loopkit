@@ -69,7 +69,7 @@ Any gap discovered mid-round goes into the ledger's **debt register** with a pri
 ## Stop & escalate
 
 - **Normal stop**: current milestone's exit conditions all closed → write a promotion request in the ledger, stop for {{OWNER|the owner}}'s sign-off; don't self-advance {{MILESTONE_BOUNDARY_NOTE|default: unless the ledger authorizes boundary auto-pass}}.
-- **Blocked**: {{OWNER_DECISION_ITEMS — e.g. DDL, freezing a contract, credentials/data/remote env, lowering a metric bar}} → log under `owner-blocked` and do another item. The supervisor adjudicates anything within its authority via the directives file — check it before treating an item as stuck; if all remaining items are blocked, stop with an escalation report.
+- **Blocked**: {{OWNER_DECISION_ITEMS — e.g. DDL, freezing a contract, credentials/data/remote env, lowering a metric bar}}. **First check the STANDING directives in `{{DIRECTIVES_PATH|directives.md}}`**: if a standing authorization already covers this action and its evidence bar is met (e.g. "drop a table once 0 rows + 0 consumers + 0 reads/writes"), it is **not** blocked — gather and record that evidence in the ledger, then execute it (via the authorized reversible method) this round. Do **not** demote pre-authorized work to a proposal-and-wait. Only if **no** standing authorization covers it: log under `owner-blocked` and do another item. The supervisor also adjudicates anything within its authority via the directives file — check it before treating an item as stuck; if all remaining items are blocked, stop with an escalation report.
 - **Stall guard**: two consecutive rounds with no change to the gate scoreboard or metric snapshot → stop, output a stall diagnosis, don't spin.
 
 ## Red lines (violate → stop immediately)
