@@ -93,7 +93,7 @@ flowchart LR
 - **台账是活文件，不是 host 里的文字。** 把执行方提示词交给 host，但台账和 directives 始终是 node 每轮重新读取的文件——绝不折进 host 自己的 goal/提示词文字里，那样会变陈旧。host 的进度 UI（goal 的完成条）只是台账的**镜子**，永不替代它，冲突一律以台账为准。
 - **监督节点永远是自己独立的 host、独立干净上下文**——一个单独会话或一次 cron tick，绝不是执行方会话里的 subagent。那个 subagent 会共享整套方法刻意保持干净的上下文。
 
-所以"一台廉价执行方 + 另一台强监督方"是头等用法，不是什么特殊集成。启动片段放在 [`templates/hosts/`](templates/hosts/)：一个 Grok `/goal` **瘦启动器**——把 goal 指向 run 目录的文件、跨轮次连续运行（而不是把整段提示词粘进去、每轮停一次），一个给监督方的 Claude cron 片段，以及一个手动粘贴兜底。每次 run 生成的 `LAUNCH.md` 会用真实路径把它们填好。
+所以"一台廉价执行方 + 另一台强监督方"是头等用法，不是什么特殊集成。启动片段放在 [`templates/hosts/`](templates/hosts/)，按运行时给你什么来分两类：**goal 类** host 把任务跑到完成、自带 done 信号（Grok `/goal`、Codex 委派任务）；**loop 类** host 每轮重新唤起、node 从台账续跑（Cursor 后台 agent、Claude Code `/loop`+cron、shell `while`）。两类的启动器都是指向 run 目录文件的瘦指针，让 node 每轮重读活文件、而不是从粘死的提示词里漂移。每次 run 生成的 `LAUNCH.md` 会用真实路径把对应片段填好。
 
 ## 快速开始
 
@@ -107,7 +107,7 @@ flowchart LR
 
 2. **在 Claude Code 里运行 `/graphkit`**，回答面试：仓库与分支、目标及验证方式、里程碑、门禁命令、红线、提交授权、监督间隔。文件生成到你仓库里全新的 `.graphkit/<日期-slug>/` 目录——一次 run 一个目录，新 run 不改旧 run 的文件。（[每个文件的作用 →](#每次-run-生成的文件)）
 
-3. **启动执行节点：** 用生成的 `LAUNCH.md` 里的片段在对应 host 上启动。在 Grok 上就是一个 `/goal` 瘦启动器，指向 run 目录的文件——它会一轮接一轮自己跑，会话挂了就从台账续跑，而不是每轮等你去戳一下。（把整段 `executor.md` 粘进对话仍可作为手动兜底。）
+3. **启动执行节点：** 用生成的 `LAUNCH.md` 里的片段在对应 host 上启动。goal 类 host（Grok、Codex）是一个瘦启动器，把任务一轮接一轮跑到完成；loop 类 host（Cursor、Claude Code、shell）由外部循环每轮重新唤起。两种方式会话挂了都从台账续跑，而不是每轮等你去戳一下。
 
 4. **启动监督节点**（可选，推荐）：graphkit 按你的间隔调度 `supervisor.md`——Claude Code 里走 cron，否则每个间隔开一个全新会话。
 
