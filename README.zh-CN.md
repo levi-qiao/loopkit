@@ -123,6 +123,7 @@ flowchart LR
 | [`templates/`](templates/) | 节点与边的模板，技能按 run 填充；脱离 Claude Code 也可手动使用。 |
 | [`docs/methodology.md`](docs/methodology.md) | 设计依据：每条规则及其防范的失败模式。 |
 | [`examples/add-tests-to-cli/`](examples/add-tests-to-cli/) | 一次完整的样例 run——executor 与台账跑到第 3 轮的样子。建议先读。 |
+| [`examples/migrate-blob-storage/`](examples/migrate-blob-storage/) | 更长的样例 run——里程碑、先试点再全量的回填、一次收敛轮，以及一条识破"自报证据"的监督指令。 |
 
 ## 每次 run 生成的文件
 

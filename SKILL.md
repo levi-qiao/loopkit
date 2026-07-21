@@ -108,3 +108,4 @@ Also write a short **`LAUNCH.md`** into the run directory: the copy-paste launch
 - `templates/hosts/` — copy-paste launch snippets, one file per host class: `goal-based.md` (Grok `/goal`, Codex task) and `loop-based.md` (Cursor agent, Claude `/loop`+cron, shell). Read only the class that applies. Hosts keep a node alive; they never become a second scoreboard.
 - `docs/methodology.md` — the deep dive (why each rule exists, failure modes it prevents).
 - `examples/add-tests-to-cli/` — a fully worked, generic example.
+- `examples/migrate-blob-storage/` — a longer worked example: milestones, a cohort pilot, and a supervisor directive in action.
