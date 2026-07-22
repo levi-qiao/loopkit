@@ -9,7 +9,7 @@ labels: bug
 A clear description of the bug.
 
 **Which part**
-- [ ] `/graphkit` skill / interview
+- [ ] `/octopus` skill / interview (loop-graph or quest arm)
 - [ ] a template (`templates/…`)
 - [ ] the installer (`install.sh`)
 - [ ] docs / example

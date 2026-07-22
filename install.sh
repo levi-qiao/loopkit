@@ -1,24 +1,47 @@
 #!/usr/bin/env sh
-# graphkit installer — drops the skill into your Claude Code skills folder.
+# octopus-skill installer — clones the library once and installs it as a single
+# `/octopus` skill (an umbrella that routes to the graphkit or goal arm inside).
+# Deliberately does NOT touch any existing `graphkit` install, so a running loop
+# is never disturbed; invoke the new library as /octopus.
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/levi-qiao/graphkit/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/levi-qiao/octopus-skill/main/install.sh | sh
 set -eu
 
-SKILL_NAME="graphkit"
-REPO="https://github.com/levi-qiao/graphkit.git"
-SKILLS_DIR="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
-DEST="$SKILLS_DIR/$SKILL_NAME"
+REPO="https://github.com/levi-qiao/octopus-skill.git"
+CACHE="${OCTOPUS_CACHE:-$HOME/.local/share/octopus-skill}"
+NAME="octopus"
 
-echo "Installing $SKILL_NAME -> $DEST"
-mkdir -p "$SKILLS_DIR"
-
-if [ -d "$DEST/.git" ]; then
-  echo "Already installed; updating..."
-  git -C "$DEST" pull --ff-only
+# 1. Clone or update the library once. (If OCTOPUS_CACHE points at an existing
+#    clone — e.g. your dev checkout — it's updated in place and linked live.)
+if [ -d "$CACHE/.git" ]; then
+  echo "Updating octopus-skill in $CACHE ..."
+  git -C "$CACHE" pull --ff-only || echo "  (skipped pull — local changes present)"
 else
-  git clone --depth 1 "$REPO" "$DEST"
+  echo "Cloning octopus-skill -> $CACHE"
+  mkdir -p "$(dirname "$CACHE")"
+  git clone --depth 1 "$REPO" "$CACHE"
 fi
 
+# 2. Symlink the whole library into each host skills dir as `octopus`. One entry;
+#    the root SKILL.md routes to skills/graphkit or skills/goal, and every
+#    ../../lib reference resolves because the whole repo sits under the link.
+link_octopus() {
+  skills_dir="$1"
+  [ -d "$(dirname "$skills_dir")" ] || return 0   # host not installed — skip
+  mkdir -p "$skills_dir"
+  dest="$skills_dir/$NAME"
+  if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+    bak="$dest.bak-$(date +%Y%m%d%H%M%S)"
+    mv "$dest" "$bak"
+    echo "  backed up existing $NAME -> $bak"
+  fi
+  ln -sfn "$CACHE" "$dest"
+  echo "  linked $NAME -> $dest"
+}
+
+echo "Installing /octopus (existing /graphkit installs are left untouched):"
+link_octopus "${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
+link_octopus "${CODEX_SKILLS_DIR:-$HOME/.codex/skills}"
+
 echo ""
-echo "✅ graphkit installed."
-echo "   In Claude Code, run:  /graphkit"
+echo "✅ octopus-skill installed. In your host, run:  /octopus"
