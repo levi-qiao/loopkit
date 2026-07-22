@@ -10,6 +10,8 @@ different environments and changing color to fit each one.
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 ![Hosts: Claude Code · grok · Cursor · Codex](https://img.shields.io/badge/hosts-Claude%20Code%20·%20grok%20·%20Cursor%20·%20Codex-8A2BE2)
 
+English · [简体中文](README.zh-CN.md)
+
 <img alt="the graph: an executor node and a clean-context supervisor node communicating only through durable files" src="assets/graph.png" width="100%" />
 
 ## Why this exists

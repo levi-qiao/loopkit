@@ -8,8 +8,8 @@ A [Claude Code](https://claude.com/claude-code) skill that turns *"make this pro
 
 graphkit is **graph engineering** made concrete — the shift from tuning a single agent loop to wiring specialized agent roles into a graph. Two roles today; more planned.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](../../LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](../../CONTRIBUTING.md)
 ![Claude Code Skill](https://img.shields.io/badge/Claude%20Code-Skill-8A2BE2)
 
 English · [简体中文](README.zh-CN.md)
@@ -161,8 +161,8 @@ Executor plus supervisor is the smallest useful graph, not the whole idea. A rol
 
 ## Contributing
 
-Issues and PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+Issues and PRs welcome — see [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 ## License
 
-[MIT](LICENSE) © 2026 levi-qiao
+[MIT](../../LICENSE) © 2026 levi-qiao
