@@ -16,6 +16,9 @@ graphkit 是 **graph engineering（图工程）** 的一次具体落地——从
 
 </div>
 
+> [!NOTE]
+> **graphkit 已作为 [octopus-skill](https://github.com/levi-qiao/octopus-skill) 🐙 的一条「腕」继续演进** —— 一个面向长周期智能体任务的精选提示词库，可编译到任意宿主（Claude Code、grok、Cursor、Codex）。后续开发在那里进行；graphkit 是其中的 loop-graph 腕，另有一条 `goal` 腕，直接骑宿主自带的验证器。本仓库保持原样。感谢每一位在这里塑造过 graphkit 的人。
+
 ---
 
 ## 问题

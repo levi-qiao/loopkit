@@ -16,6 +16,9 @@ English · [简体中文](README.zh-CN.md)
 
 </div>
 
+> [!NOTE]
+> **graphkit lives on as an arm of [octopus-skill](https://github.com/levi-qiao/octopus-skill) 🐙** — a curated prompt library for long-horizon agent work, compiled to any host (Claude Code, grok, Cursor, Codex). New development continues there; graphkit is the loop-graph arm, joined by a `goal` arm that rides a host's native verifier. This repo stays as-is. Thanks to everyone who shaped graphkit here.
+
 ---
 
 ## The problem
