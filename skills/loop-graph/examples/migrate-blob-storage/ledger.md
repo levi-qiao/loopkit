@@ -4,10 +4,10 @@
 
 ## Status header
 
-Current milestone: M2 complete — M3 cutover awaiting owner sign-off | Round: 6 | Last round net lines: +31/−9
+Current milestone: M3 cutover — owner-only DDL | Round: 8 | Last round net lines: +0/−0
 Smallest unclosed item: M3 (owner-only: drop the blob column)
-Convergence: fires at 5 rounds since last or +400 net lines, whichever first | since last: 1 round / +22 net (round 5 was the convergence, reset) | **next round converges: no**
-Milestone gate: `passed` (M2 accepted after the D-001 re-verification; M3 is the final, owner-only boundary — held via Run status, not the soft gate)
+Convergence: fires at 5 rounds since last or +400 net lines, whichever first | since last: 3 rounds / +22 net | **next round converges: no**
+Milestone gate: `passed` (D-002 acceptance directive released M2→M3 boundary in Round 8)
 Run status: `owner-blocked`
 
 ---
@@ -32,13 +32,13 @@ Run status: `owner-blocked`
 
 ## owner-blocked
 
-- M3 cutover: `ALTER TABLE attachments DROP COLUMN data` is schema DDL (owner-only). Promotion request written Round 6 — awaiting sign-off.
+- M3 cutover: `ALTER TABLE attachments DROP COLUMN data` is schema DDL (owner-only). Promotion request written Round 8 — awaiting sign-off.
 
 ## Debt & gap register
 
 | ID | Priority | One line |
 | --- | --- | --- |
-| GAP-001 | P2 | 41 legacy rows have NULL `content_type`; serve path falls back to `application/octet-stream` — proper sniffing queued, not a blocker for M2 |
+| GAP-001 | ~~P2~~ closed | 41 legacy rows have NULL `content_type`; serve-path sniffing added Round 7 — falls back to `application/octet-stream` for unrecognizable blobs |
 
 ## Rounds log
 
@@ -94,4 +94,34 @@ Run status: `owner-blocked`
 - **Verify**: re-run set diff → empty; checksum sample 48/48 match; smoke green
 - **Net lines**: +31/−9
 - **Open**: GAP-001 stays queued (serve-path fallback covers it). M2 gates closed on independent evidence.
-- **Next**: **promotion request** — M3 drops the blob column (owner-only DDL). Stopping for sign-off.
+- **Next**: M2 promotion request — set Milestone gate to `pending-audit`; keep looping on debt while supervisor audits the boundary.
+
+### Round 7 — 2026-07-20
+- **Item**: M2 promotion request filed; gate set to `pending-audit`. Parked — cannot advance to M3 until the supervisor releases the gate. Working GAP-001 debt (serve-path content-type sniffing) while parked.
+- **Gate**: narrow → 12 passed; full suite + smoke green
+- **Change**: added `content_type_sniff()` fallback in the serve path for the 41 NULL-`content_type` rows — reads first 512 bytes, maps to MIME via `mimetypes`; returns `application/octet-stream` for truly unrecognizable blobs
+- **Verify**: smoke green; the 3 previously-truncated rows now serve as `application/octet-stream` (correct — no data to sniff)
+- **Net lines**: +18/−4
+- **Open**: Milestone gate still `pending-audit` — waiting on supervisor acceptance directive. GAP-001 **closed** (sniffing shipped).
+- **Next**: fold D-002 when it arrives (or continue debt work if more ticks pass)
+
+<!-- ─── Supervisor tick between Round 7 and Round 8 ─── -->
+<!-- The supervisor fired its scheduled tick here. From its clean context it:
+     1. Read the ledger — saw `Milestone gate: pending-audit` (its trigger).
+     2. Re-ran the M2 exit conditions independently:
+        - `scripts/verify_backfill.py` → set diff empty, checksum sample 48/48.
+        - `pytest -q` → 12 passed. `scripts/smoke_serve.sh` → 20/20 green.
+        - Inspected `git diff main..HEAD --stat` for undisclosed shortcuts — none.
+     3. Verdict: M2 boundary passes independent audit.
+     4. Appended D-002 (acceptance directive) to directives.md.
+     5. Checkpoint-committed the audited state (SHA `a7c3d12`).
+     The executor never saw this reasoning — only the directive that landed. -->
+
+### Round 8 — 2026-07-20
+- **Item**: D-002 arrived — M2 acceptance directive. Flipped Milestone gate from `pending-audit` → `passed`. Advanced to M3.
+- **Gate**: full suite + smoke green (no code change this round)
+- **Change**: none — gate flip is a ledger-only state transition
+- **Verify**: re-confirmed all M2 evidence still holds (set diff empty, smoke green)
+- **Net lines**: +0/−0
+- **Open**: M3 is DDL (`DROP COLUMN data`) — owner-only. Logged under `owner-blocked`.
+- **Next**: run is `owner-blocked` on M3. Executor keeps looping only if debt remains; otherwise stalls cleanly.

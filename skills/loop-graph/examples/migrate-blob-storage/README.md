@@ -1,6 +1,6 @@
 # Example: migrate blob storage out of the database
 
-A second fully worked, **generic** example — no real project, no secrets. Where [`add-tests-to-cli`](../add-tests-to-cli/) shows the smallest possible run (single goal, three rounds, empty directives), this one shows the parts of the shape that only appear on a longer, riskier task: milestones, a pilot before a cohort-scale operation, a forced convergence round, an owner-only stop — and a supervisor directive actually firing.
+A fully worked, **generic** example — no real project, no secrets. Where [`add-tests-to-cli`](../add-tests-to-cli/) shows the smallest possible run (single goal, three rounds, empty directives), this one shows the parts of the shape that only appear on a longer, riskier task: milestones, a pilot before a cohort-scale operation, a forced convergence round, an owner-only stop, a supervisor directive catching self-reported evidence — and **the non-skippable milestone gate** blocking advancement until the supervisor independently audits and releases the boundary.
 
 ## The scenario
 
@@ -21,8 +21,14 @@ The run works against a **staging dump** — production credentials are a red li
 
 ## What happened in the run
 
-The ledger in this folder shows six rounds. The one worth reading closely is Round 4: the executor ran the full backfill and recorded M2 as verified — on the evidence of the migration script's **own** "4,812 processed" counter. Inside the executor's context that number looked like proof; the script had printed it, after all. The supervisor, reading the ledger cold, saw self-generated evidence where an independent proof belonged and wrote `D-001` (in `directives.md`): produce a primary-key set diff between the table and a fresh object-store listing, plus a checksum sample. The diff found 3 rows the script had silently dropped — a swallowed per-row exception had counted failures as processed. Round 6 fixes them, proves the diff empty, and stops at the M3 gate for the owner's sign-off, because dropping a column is not the graph's call to make.
+The ledger shows eight rounds. Two sequences are worth reading closely:
 
-## The point
+**The drift catch (Rounds 4–6).** The executor ran the full backfill and recorded M2 as verified — on the evidence of the migration script's **own** "4,812 processed" counter. Inside the executor's context that number looked like proof; the script had printed it, after all. The supervisor, reading the ledger cold, saw self-generated evidence where an independent proof belonged and wrote `D-001` (in `directives.md`): produce a primary-key set diff between the table and a fresh object-store listing, plus a checksum sample. The diff found 3 rows the script had silently dropped — a swallowed per-row exception had counted failures as processed. Round 6 fixes them and proves the diff empty.
 
-The executor wasn't lying in Round 4; it was reasoning from a context that contained the script's cheerful output. That is exactly the failure a same-context loop cannot catch — the evidence that misled the worker is the evidence the reviewer would reason from too. A clean-context node never saw the script run, so "the script says so" carries no weight; only an independent listing does. One directive, one round of honest re-verification, and a count-match that would have shipped 3 missing photos became an empty set diff instead.
+**The milestone gate (Rounds 7–8).** After Round 6 closes M2's exit conditions, the executor sets `Milestone gate: pending-audit` and **keeps looping** — it doesn't idle. Round 7 works GAP-001 debt (content-type sniffing for the 41 NULL rows) while parked at the boundary. Between rounds, the supervisor's scheduled tick fires: from clean context it re-runs `verify_backfill.py`, the full test suite, and the smoke script, inspects the diff for undisclosed shortcuts, and — satisfied — appends `D-002` (an acceptance directive releasing the gate). Round 8: the executor reads D-002, flips the gate to `passed`, advances to M3, and immediately hits the owner-only DDL → `owner-blocked`.
+
+## The points
+
+**Self-generated evidence.** The executor wasn't lying in Round 4; it was reasoning from a context that contained the script's cheerful output. A same-context loop would reason from the same evidence. A clean-context supervisor never saw the script run, so "the script says so" carries no weight — only an independent listing does.
+
+**The gate cannot be skipped.** Round 7 shows the executor productively parked: it cannot self-certify milestone completion, but it doesn't stall either — it burns down debt while the supervisor independently verifies the boundary. The gate is a **tracked ledger flag** (not prose the executor can reinterpret), and advancing while it reads `pending-audit` is a red line. This means a milestone boundary always gets a clean-context audit before the run crosses it — even when no human is watching.
