@@ -39,9 +39,19 @@ Any cohort-scale operation (the full backfill, a bulk re-checksum) gets a **smal
 
 Any anomaly found mid-round (a bad legacy row, a missing content type, a slow query) goes into the ledger's debt register with a priority and is queued — not fixed inside the current item.
 
+## Milestone gate protocol
+
+When a milestone's exit conditions are all green:
+1. Write a promotion request in the ledger.
+2. Set `Milestone gate` in the status header to `pending-audit`.
+3. **Keep looping** — you are parked, not stopped. Work debt, convergence, or read-only prep while the supervisor audits the boundary. Never idle-spin.
+4. When the supervisor's acceptance directive lands (in `directives.md`), flip the gate to `passed` and advance to the next milestone.
+
+**Advancing while the gate is `pending-audit` is a red line.** The supervisor owns the boundary verdict — you do not self-certify milestone completion.
+
 ## Stop & escalate
 
-- **Milestone exit**: milestone gates all green → write a promotion request in the ledger and stop for the owner's sign-off before the next milestone.
+- **Milestone exit**: milestone gates all green → file promotion request, set gate to `pending-audit`, keep looping on debt/convergence.
 - **Blocked**: anything on the owner-only list (schema DDL, production access, lowering a gate) → log under `owner-blocked`, do another item.
 - **Stall guard**: two rounds with no scoreboard change → stop with a stall diagnosis.
 
@@ -52,3 +62,4 @@ Any anomaly found mid-round (a bad legacy row, a missing content type, a slow qu
 - Staging only: production credentials never enter code, config, logs, or commits.
 - No reset/stash/clean of others' changes; no commit/push (the supervisor commits; nobody pushes).
 - A change that reddens any previously-green test is reverted the same round.
+- Never advance past a milestone boundary while `Milestone gate` is `pending-audit`.

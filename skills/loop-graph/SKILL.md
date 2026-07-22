@@ -132,4 +132,4 @@ The loop runs fine on a **cheap/fast model** — structure, not model, keeps it 
 - `templates/` — the five fill-in artifacts (executor, ledger, directives, ops, supervisor). The executor and supervisor prompts encode the loop's self-stop.
 - `../../lib/methodology.md` — the deep dive (why each rule exists, failure modes it prevents).
 - `examples/add-tests-to-cli/` — a fully worked, generic example.
-- `examples/migrate-blob-storage/` — a longer worked example: milestones, a cohort pilot, and a supervisor directive in action.
+- `examples/migrate-blob-storage/` — a longer worked example: milestones, a cohort pilot, a supervisor directive in action, and the non-skippable milestone gate blocking until the supervisor audits and releases.
