@@ -1,6 +1,6 @@
 # Contributing to graphkit
 
-Thanks for helping! graphkit is deliberately small — a skill, four templates, docs, and one example. Contributions that keep it that way are the most welcome.
+Thanks for helping! graphkit is deliberately small — a skill, five templates, docs, and two worked examples. Contributions that keep it that way are the most welcome.
 
 ## Good contributions
 
