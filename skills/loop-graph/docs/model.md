@@ -40,8 +40,8 @@ A node is a specialized agent role. Each node is described by a tuple:
 
 | Role | Model | Activation | Reads | Writes | Authority | Stops when |
 |------|-------|------------|-------|--------|-----------|------------|
-| **Executor** | cheap/fast | per-round (adaptive or interval) | ledger, directives, ops, ambient | ledger, ops | implementation decisions | ledger reaches `exit-ready` or `closed` |
-| **Supervisor** | strong | cadence (e.g. 30min) | ledger, ops, git diff, ambient | directives | drift corrections, acceptance, plan adjustments | nothing left to commit |
+| **Executor** | cheap/fast | per-round (adaptive or interval) | ledger, directives, ambient | ledger | implementation decisions | ledger reaches `exit-ready` or `closed` |
+| **Supervisor** | strong | cadence (e.g. 30min) | ledger, git diff, ambient | directives | drift corrections, acceptance, plan adjustments | nothing left to commit |
 
 `authority` is the field #9 exposed as missing: "who decides X without escalating?" The executor decides *how* to implement; the supervisor decides *whether* the work meets acceptance criteria; the owner decides DDL, credentials, red-line exceptions.
 
