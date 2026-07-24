@@ -53,7 +53,6 @@ The nodes communicate only through inspectable state — a ledger, a git tree, a
 No LangGraph, no Python runtime, no orchestration server: the nodes and edges are Markdown files any coding agent can follow.
 
 ## How it works
-<img width="4618" height="2620" alt="graphkit — executor + clean-context supervisor graph" src="../../assets/graph.png" />
 
 ```mermaid
 flowchart LR

@@ -30,11 +30,11 @@ Use the **quest arm** when *all* hold:
   hosts/models);
 - no owner-only decision sits on the goal's critical path.
 
-Use the **loop-graph arm** (`../loop-graph`) when *any* hold: multi-milestone phases,
+Use the **[loop-graph arm](../loop-graph)** when *any* hold: multi-milestone phases,
 executor and supervisor on different hosts/models/cadences, owner red-lines/gates
 that must stop the run, cross-session durability, or a host that **only loops** and
 has no goal command (**Claude Code**, **Cursor**, shell) — there loop-graph supplies
-the verifier as the supervisor node. See `../../lib/host-dialects.md` for which host
+the verifier as the supervisor node. See [`host-dialects.md`](../../lib/host-dialects.md) for which host
 has what.
 
 ## How to run it
@@ -43,7 +43,7 @@ has what.
 silently pick). Ask in order — skip only if context already answers:
 
 1. **Host** — where does the goal run? (**grok `/goal`**, a **Codex task**). This
-   picks the invocation dialect (`../../lib/host-dialects.md`). If the host has **no**
+   picks the invocation dialect ([`host-dialects.md`](../../lib/host-dialects.md)). If the host has **no**
    goal command — Claude Code, Cursor, shell — stop and switch to the loop-graph arm.
 2. **Objective** — the goal in one sentence.
 3. **Acceptance criteria** — the North Star, each as a check the host's verifier can
@@ -62,7 +62,7 @@ silently pick). Ask in order — skip only if context already answers:
 owner-only call on the critical path, say so and switch to the loop-graph arm — the
 quest arm deliberately has no gate and no owner-stop loop.
 
-**Step 2 — Fill the template.** Copy `templates/quest.md`, replace every
+**Step 2 — Fill the template.** Copy [`templates/quest.md`](templates/quest.md), replace every
 `{{PLACEHOLDER}}`, delete the guidance comments. Interview in the user's language and
 mirror it in the prose; keep structural headings as in the template.
 
@@ -75,7 +75,7 @@ the user how **in the chat** (print it, don't assume this session is the host):
   across rounds. Since there's no separate refuter, the objective's acceptance
   criteria carry the whole verification burden — make them reproducible.
 
-Optional reliability upgrade on grok (from `../../lib/host-dialects.md`): a `Stop`
+Optional reliability upgrade on grok (from [`host-dialects.md`](../../lib/host-dialects.md)): a `Stop`
 hook to hold the turn open until a gate passes; a `Notification` hook to ping the
 owner when the goal parks on a real blocker.
 
@@ -87,6 +87,6 @@ probably be using the loop-graph arm outright.
 
 ## Files in this skill
 
-- `templates/quest.md` — the single objective prompt.
-- shared: `../../lib/host-dialects.md` (which primitive each host has + syntax),
-  `../../lib/methodology.md` (why the discipline rules exist).
+- [`templates/quest.md`](templates/quest.md) — the single objective prompt.
+- shared: [`host-dialects.md`](../../lib/host-dialects.md) (which primitive each host has + syntax),
+  [`methodology.md`](../../lib/methodology.md) (why the discipline rules exist).
