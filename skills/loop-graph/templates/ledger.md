@@ -1,15 +1,18 @@
 <!--
 graphkit template: ledger.md — THE SINGLE SCOREBOARD (shared state between nodes).
 The executor node rewrites this every round; the supervisor node only reads it.
-Keep it COMPACT: it is read every round, so bloat costs tokens. When history piles
-up, archive the old rounds to a separate file and carry only load-bearing facts
-forward in the "Starting snapshot" below.
+Keep it COMPACT: on a fresh-context host it is re-read every round, so its size is a
+per-round token tax — an unbounded Rounds log makes each round cost more than the last
+(O(n²) over a run). Hard rule: keep only the last {{KEEP_ROUNDS|5}} round entries here;
+when a new round pushes past that, move the oldest into `rounds-archive.md`
+(append-only, never re-read each round). Carry durable facts in the "Starting
+snapshot" below; update the durable sections in place, never by appending.
 -->
 
 # {{PROJECT}} — graphkit Ledger
 
 > This ledger is the run's only scoreboard. Authority order: {{AUTHORITY_LAYERS}} > this ledger. Environment facts: `ops.md`. Corrections from the supervisor: `directives.md`.
-> When rounds accumulate, archive to `archive/ledger-archive-<date>.md` beside this file and keep only the snapshot below. Don't open archives unless debugging.
+> Rounds log holds only the last {{KEEP_ROUNDS|5}} rounds; older rounds live in `rounds-archive.md` beside this file (append-only) — don't open it unless debugging. Everything a fresh round needs is the snapshot + durable sections below.
 
 ## Status header
 
@@ -59,16 +62,13 @@ Keep it tight.}}
 | --- | --- | --- | --- |
 | GAP-001 | P? | {{M?}} | {{...}} |
 
-## Rounds log
+## Rounds log — last {{KEEP_ROUNDS|5}} only (older → `rounds-archive.md`)
 
-<!-- Append one block per round. Format: -->
-<!--
-### Round N — <date>
-- **Item**: ...
-- **Gate**: <commands + result>
-- **Change**: <what + why, 1-2 lines>
-- **Verify**: <narrowest test/smoke + result>
-- **Net lines**: +x/-y
-- **Open**: <what's still not closed on this item>
-- **Next**: <the next smallest item>
--->
+<!-- ONE TERSE LINE per round — this section is re-read every round, so keep it small.
+When appending would exceed {{KEEP_ROUNDS|5}} lines, cut the oldest and append it
+verbatim to `rounds-archive.md`. Never let history pile up here. Line format: -->
+<!-- - R<n> <date> | <item> | gate: <result> | net +x/-y | <VLM/metric delta, or —> | open: <what's left, or —> | next: <next item> -->
+
+<!-- You MAY keep only the CURRENT round as a short multi-line block when it carries
+detail the supervisor must see this tick (e.g. a promotion request's evidence);
+collapse it to the one-line form once the next round starts. -->

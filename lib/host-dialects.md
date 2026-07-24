@@ -55,6 +55,15 @@ terminal status and stops cannot restart itself. (This is exactly why a Codex
 graphkit node uses the interval heartbeat, not a goal: the heartbeat cheap-ticks
 through a park, a goal livelocks on it — see ¹.)
 
+A fresh-context interval host (Codex heartbeat, Grok, shell) also **re-reads the run
+files every round** — executor + ledger + directives — a fixed per-round token tax.
+Two levers keep it affordable: **bound the ledger** (the ledger/executor templates'
+`KEEP_ROUNDS` rotation — keep the last few rounds hot, archive the rest to
+`rounds-archive.md`; an unbounded Rounds log makes each round cost more than the last,
+**O(n²)** over a run) and **size rounds coarser** (batch sibling items sharing one
+verification, so real work exceeds the tax). On the adaptive `/loop` host context
+persists between rounds, so this tax is near-zero.
+
 ## Goal primitive (a built-in executor+verifier — the goal arm rides this)
 
 | Host | Command | Built-in verifier? |
