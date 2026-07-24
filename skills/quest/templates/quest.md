@@ -1,7 +1,7 @@
 <!--
 octopus quest arm: quest.md — the SINGLE objective prompt.
 Replace every {{PLACEHOLDER}}, delete guidance comments, then hand the result to
-the host's goal command (grok `/goal <this>`; Codex: delegate a task with this brief).
+the host's goal command (Grok `/goal <this>`; Codex: delegate a task with this brief).
 There is NO separate supervisor prompt and NO second loop: the host's own harness
 is the acceptance auditor. Your only job is to write an objective whose acceptance
 criteria that harness can actually check. If the host only loops and has no goal
@@ -35,8 +35,10 @@ swapping the denominator.}}
 - **No test theater.** A passing test must prove the *shipped* code works on the
   real path — no hard-coded expected values, no starting past the thing under
   test, no re-implementing it inside the test. A test that passes while the
-  program is broken is worse than none. Commit the tests and save their run
-  output; the verifier audits that evidence rather than rebuilding it.
+  program is broken is worse than none. Commit the tests. Saved run output is
+  supplemental evidence only; the verifier must independently re-run the
+  acceptance command against the final tree and never treat saved output as
+  authoritative.
 - **No speculative building.** Before adding any endpoint / module / config /
   pool, name its real consumer. No consumer → don't build it. No compat
   double-paths, no v1/v2 coexistence, no parallel error systems.

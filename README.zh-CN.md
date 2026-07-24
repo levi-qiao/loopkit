@@ -1,12 +1,12 @@
 # octopus-skill 🐙
 
 **一个脑子,多条腕。** 一个面向长周期智能体任务的精选提示词库,可编译到你用的任意
-宿主 —— Claude Code、grok、Cursor、Codex。方法论共享,每条*腕*把它适配到宿主原生的
+宿主 —— Claude Code、Grok、Cursor、Codex。方法论共享,每条*腕*把它适配到宿主原生的
 形态(一个 loop,或一个 goal)。像章鱼一样:一套神经系统伸进不同环境,并变色适应每一处。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-![Hosts: Claude Code · grok · Cursor · Codex](https://img.shields.io/badge/hosts-Claude%20Code%20·%20grok%20·%20Cursor%20·%20Codex-8A2BE2)
+![Hosts: Claude Code · Grok · Cursor · Codex](https://img.shields.io/badge/hosts-Claude%20Code%20·%20Grok%20·%20Cursor%20·%20Codex-8A2BE2)
 
 [English](README.md) · 简体中文
 
@@ -24,18 +24,45 @@
 
 | 腕 | 何时用 | 交付 |
 |-----|----------|-------|
-| **[`loop-graph`](skills/loop-graph)** | 你会用 `/loop` 驱动它(Claude Code、grok、Cursor、shell);容易 scope 蔓延或假装"done"的多轮任务;多里程碑阶段;执行者与监督者跨宿主/模型拆分;有 owner 闸门 | 一个**执行者节点**(围绕单一真相源 ledger 干活)+ 一个**清洁上下文的监督者节点**,从外部复验、并通过单向 directives 文件纠偏 —— 两个 loop |
-| **[`quest`](skills/quest)** | 你会把它交给一个自驱到完成的 goal 命令(grok `/goal`、Codex task);单一、自包含的目标,执行者与审查在同一次运行里 | **一段 objective 提示词**,把纪律折进去,骑宿主自己的验证器 —— 无第二个 loop |
+| **[`loop-graph`](skills/loop-graph)** | 你会用 `/loop` 驱动它(Claude Code、Grok、Cursor、shell);容易 scope 蔓延或假装"done"的多轮任务;多里程碑阶段;执行者与监督者跨宿主/模型拆分;有 owner 闸门 | 一个**执行者节点**(围绕单一真相源 ledger 干活)+ 一个**清洁上下文的监督者节点**,从外部复验、并通过单向 directives 文件纠偏 —— 两个 loop |
+| **[`quest`](skills/quest)** | 你会把它交给一个自驱到完成的 goal 命令(Grok `/goal`、Codex task);单一、自包含的目标,执行者与审查在同一次运行里 | **一段 objective 提示词**,把纪律折进去,骑宿主自己的验证器 —— 无第二个 loop |
 
 拿不准?判定规则写在每条腕 `SKILL.md` 的开头,宿主能力矩阵在
 [`lib/host-dialects.md`](lib/host-dialects.md)。
+
+## 哪个宿主,怎么跑
+
+两条腕,一套纪律。**先按任务形态选腕**——再用那个宿主要的方式跑。大多数宿主两条都能跑,
+宿主只负责"排除掉不可用的那条":
+
+- **loop-graph** —— 多里程碑 / 有不可跳过的 gate / 执行者与监督者跨宿主拆分 / 有 owner
+  闸门,或你想要一个**独立**验证器。两段提示词:一个**执行者** loop 围绕 ledger 干活,加
+  一个清洁上下文的**监督者** loop,从外部复验、通过单向 directives 文件纠偏。*监督者永远
+  是一个 `/loop`,绝不是 goal*—— 审计者必须从执行者上下文之外、按间隔醒来;goal 会冲刺到
+  "done"。
+- **quest** —— 一个**单一、自包含、能驱动到真正 done** 的目标。一段 objective 提示词,宿主
+  自己的 harness 驱动它(在 Grok 上还负责验证)。没有第二个 loop。
+
+权威语法与矩阵见 [`lib/host-dialects.md`](lib/host-dialects.md)。
+
+| 宿主 | 它有什么 | 两条腕分别怎么跑 |
+|---|---|---|
+| **Grok** | **两者都有**:`/loop` 和一个**自带原生对抗式验证器**的 `/goal` | **quest:**`/goal <objective>`。**loop-graph:**执行者 `/loop` + 监督者 `/loop`。 |
+| **Codex** | **两者都有** —— 一个任务能自驱一个 goal 到 done;对话里 `/loop <间隔>` 会建一个**心跳定时器** | **quest:**`/goal` / 直接把 objective 作为任务发给它(自驱;无独立验证器,验收标准要可复现)。**loop-graph:**两个节点都用带间隔的 `/loop`(如 `/loop 4m …`)—— **必须带显式间隔,且绝不用 `/goal`**:goal 会把一个**停泊中**的节点无限重唤(活锁)。 |
+| **Claude Code** | `/loop`(自适应 / 自定步调);**没有 `/goal` 命令** | **loop-graph:**执行者 `/loop`(不带间隔 → 自定步调)+ 监督者 `/loop`;监督者就是验证器。**quest:**一个自定步的单 `/loop`(无独立验证器)。 |
+| **Cursor** | 只有 `/loop`(定间隔;单轮超过 **约 20 分钟会被杀**);无 goal | **只能 loop-graph。** 执行者 `/loop` + 监督者 `/loop`;每轮控制在 20 分钟内。 |
+| **shell / cron** | 只有 `while … sleep` / crontab;无 goal | **只能 loop-graph。** 两个 loop 都要排期;ledger 到终态就 `break`。 |
+
+一句话记牢:**任务形态决定用哪条腕;宿主只排除不可用的**(Cursor 和 shell 没有 goal,跑不了
+quest)。**监督者永远是 `/loop`,绝不是 goal。** Codex 上:quest → `/goal`;loop-graph →
+两个节点都用带间隔的 `/loop` 心跳,因为 goal 会把停泊中的 loop-graph 节点活锁。
 
 ## 脑(`lib/`)
 
 - **[`methodology.md`](lib/methodology.md)** —— *为什么*每条规则存在,对应它防范的那个长
   周期智能体失败模式。想在不破坏方法的前提下调规则,先读它。
 - **[`host-dialects.md`](lib/host-dialects.md)** —— 各宿主差异的单一 owner:loop/goal 的调用
-  语法、自适应 vs 定间隔的行为、以及唤醒/通知/保活原语(grok 的 `Stop`/`Notification` hook 等)。
+  语法、自适应 vs 定间隔的行为、以及唤醒/通知/保活原语(Grok 的 `Stop`/`Notification` hook 等)。
 
 ## 安装
 
