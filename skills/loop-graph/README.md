@@ -53,28 +53,28 @@ The nodes communicate only through inspectable state — a ledger, a git tree, a
 No LangGraph, no Python runtime, no orchestration server: the nodes and edges are Markdown files any coding agent can follow.
 
 ## How it works
-<img width="4618" height="2620" alt="graphkit — executor + clean-context supervisor graph" src="../../assets/graph.png" />
 
 ```mermaid
 flowchart LR
-    U([You]) -->|"/octopus"| I[Interview:<br/>goal · gates · red lines]
-    I --> G[Generate the graph]
-    G --> EX[executor.md]
-    G --> LG[ledger.md]
-    G --> DIR[directives.md]
-    G --> OPS[ops.md]
-    G --> SV[supervisor.md]
-    EX -->|fresh context| EXE((Executor node))
-    EXE <-->|reads / rewrites| LG
-    SV -->|clean context, every 30 min| SUP((Supervisor node))
-    SUP -->|reads only| LG
-    SUP -->|corrections| DIR
-    DIR -->|read each round| EXE
+    U([You]) -->|"/octopus" interview| G[Generate the graph]
+    G --> EXE((Executor<br/>cheap · every round))
+    G --> SUP((Supervisor<br/>strong · ~30 min<br/>clean context))
+
+    EXE <-->|reads / writes| LG[(ledger<br/>single scoreboard)]
+    SUP -->|reads only · re-verifies| LG
+    SUP -->|corrections| DIR[/directives<br/>one-way/]
+    DIR -->|folded in each round| EXE
     SUP -->|checkpoint commit| GIT[(git)]
-    SUP -->|human-only gaps| U
+    SUP -->|owner-only calls| U
+
+    SUP -.->|research brief| SC((Scout<br/>cheap · on-demand)):::opt
+    SC -.->|writes| FND[/findings<br/>read on-reference/]:::opt
+    FND -.->|consume · retire| EXE
+
+    classDef opt stroke-dasharray:5 4;
 ```
 
-The executor works against the ledger; the supervisor watches from outside, commits clean checkpoints, and injects corrections through the directives edge. The two never share a context and never write the same file.
+Solid edges are the core graph: the executor works against the ledger; the supervisor watches from outside, commits clean checkpoints, and injects corrections through the one-way directives edge. The two never share a context and never write the same file. The dashed **scout** is an optional node — added only when research needs to happen off the critical path — writing to its own findings edge (see the [roadmap](#roadmap-more-node-roles)).
 
 ## One strong model, cheap execution
 
